@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Foundry Clinic — Book an Appointment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0ede8;
+      color: #2a2a2a;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #1e1e1e;
+      padding: 30px 24px 26px;
+      text-align: center;
+    }
+    .logo-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon { flex-shrink: 0; }
+    .logo-text { text-align: left; }
+    .logo-name {
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+    }
+    .logo-tagline {
+      color: rgba(255,255,255,0.45);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    /* ── Step Progress ── */
+    .progress-wrap {
+      padding: 0 20px;
+    }
+    .progress-card {
+      background: #fff;
+      border: 1px solid #e5e2dc;
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin: 28px auto 0;
+      max-width: 980px;
+      overflow-x: auto;
+    }
+    .steps {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      min-width: 580px;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      flex: 1;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 19px;
+      left: 55%;
+      right: -55%;
+      height: 1px;
+      background: #e0ddd8;
+    }
+    .step-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: #bbb;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+      transition: all 0.25s;
+    }
+    .step.active .step-circle {
+      background: #1e1e1e;
+      border-color: #1e1e1e;
+      color: #fff;
+    }
+    .step.done .step-circle {
+      background: #4fa39a;
+      border-color: #4fa39a;
+      color: #fff;
+      font-size: 15px;
+    }
+    .step-label {
+      font-size: 10.5px;
+      color: #bbb;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .step.active .step-label { color: #2a2a2a; font-weight: 600; }
+    .step.done .step-label  { color: #4fa39a; }
+
+    /* ── Main ── */
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page visibility ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Typography ── */
+    .section-tag {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: #4fa39a;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .page-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 38px;
+      font-weight: 400;
+      color: #1e1e1e;
+      margin-bottom: 6px;
+      line-height: 1.15;
+    }
+    .page-sub {
+      color: #888;
+      font-size: 14.5px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e5e0;
+      border-radius: 12px;
+      padding: 30px 28px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Form ── */
+    .form-label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 7px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1.5px solid #dedad4;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #2a2a2a;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: #4fa39a; }
+    .form-input::placeholder { color: #bfbbb5; }
+    .form-group { margin-bottom: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15.5px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-primary { background: #4fa39a; color: #fff; letter-spacing: 0.01em; }
+    .btn-primary:hover { background: #3b8f87; }
+    .btn-primary:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    /* ── Notice ── */
+    .notice {
+      background: #eef5f6;
+      border-radius: 8px;
+      padding: 13px 15px;
+      font-size: 13.5px;
+      color: #555;
+      margin-bottom: 22px;
+    }
+    .notice a { color: #4fa39a; font-weight: 500; text-decoration: underline; cursor: pointer; }
+
+    /* ── Caption ── */
+    .caption {
+      text-align: center;
+      font-size: 12.5px;
+      color: #aaa;
+      margin-top: 14px;
+    }
+
+    /* ── Back link ── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #999;
+      font-size: 13.5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      margin-bottom: 20px;
+      padding: 0;
+    }
+    .back-btn:hover { color: #4fa39a; }
+
+    /* ── Option grid (services / payment type) ── */
+    .option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 11px;
+      margin-bottom: 22px;
+    }
+    .option-card {
+      border: 1.5px solid #e0ddd8;
+      border-radius: 10px;
+      padding: 20px 18px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      background: #fff;
+      user-select: none;
+    }
+    .option-card:hover { border-color: #4fa39a; }
+    .option-card.selected { border-color: #4fa39a; background: #f0f4f7; }
+    .option-card-icon { font-size: 26px; margin-bottom: 8px; }
+    .option-card-title { font-weight: 600; font-size: 14.5px; color: #1e1e1e; margin-bottom: 3px; }
+    .option-card-meta { font-size: 12.5px; color: #999; }
+
+    /* ── Treatment list ── */
+    .treatment-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 22px; }
+    .treatment-item {
+      border: 1.5px solid #e0ddd8;
+      border-radius: 10px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .treatment-item:hover, .treatment-item.selected {
+      border-color: #4fa39a;
+      background: #f0f4f7;
+    }
+    .treatment-name { font-weight: 500; font-size: 14.5px; }
+    .treatment-meta { font-size: 12.5px; color: #999; margin-top: 2px; }
+    .treatment-price { font-weight: 600; color: #4fa39a; font-size: 15px; white-space: nowrap; margin-left: 16px; }
+
+    /* ── Specialist grid ── */
+    .specialist-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+      margin-bottom: 22px;
+    }
+    .specialist-card {
+      border: 1.5px solid #e0ddd8;
+      border-radius: 10px;
+      padding: 22px 16px;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: #fff;
+      text-align: center;
+      user-select: none;
+    }
+    .specialist-card:hover, .specialist-card.selected {
+      border-color: #4fa39a;
+      background: #f0f4f7;
+    }
+    .specialist-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #1e1e1e;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 auto 11px;
+    }
+    .specialist-avatar.teal { background: #4fa39a; }
+    .specialist-name { font-weight: 600; font-size: 14px; }
+    .specialist-role { font-size: 12px; color: #999; margin-top: 3px; }
+
+    /* ── Calendar ── */
+    .calendar {
+      background: #fff;
+      border: 1px solid #e8e5e0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .cal-nav {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #4fa39a;
+      font-size: 20px;
+      line-height: 1;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .cal-nav:hover { background: #f0f4f7; }
+    .cal-month { font-weight: 600; font-size: 14.5px; }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .cal-day-label {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #bbb;
+      text-transform: uppercase;
+      padding: 4px 0 8px;
+    }
+    .cal-day {
+      text-align: center;
+      padding: 8px 2px;
+      border-radius: 7px;
+      font-size: 13.5px;
+      color: #2a2a2a;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cal-day:hover:not(.dis):not(.emp) { background: #f0f4f7; }
+    .cal-day.sel { background: #4fa39a !important; color: #fff; font-weight: 600; }
+    .cal-day.tod { color: #4fa39a; font-weight: 700; }
+    .cal-day.dis { color: #d5d2cd; cursor: default; }
+    .cal-day.emp { cursor: default; }
+
+    /* ── Time slots ── */
+    .slots-label { font-size: 14px; font-weight: 600; margin-bottom: 11px; }
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .slot {
+      border: 1.5px solid #e0ddd8;
+      border-radius: 7px;
+      padding: 9px 6px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13.5px;
+      transition: all 0.15s;
+      background: #fff;
+      user-select: none;
+    }
+    .slot:hover:not(.unavail) { border-color: #4fa39a; }
+    .slot.sel { background: #4fa39a; border-color: #4fa39a; color: #fff; font-weight: 600; }
+    .slot.unavail { color: #d5d2cd; cursor: default; background: #fafaf9; }
+
+    /* ── Summary ── */
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid #f0ede8;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .sum-label { font-size: 13px; color: #888; }
+    .sum-val { font-size: 14px; font-weight: 500; color: #1e1e1e; text-align: right; max-width: 60%; }
+    .sum-total { font-size: 20px; font-weight: 700; color: #4fa39a; }
+
+    /* ── Success ── */
+    .success-wrap { text-align: center; padding: 48px 28px; }
+    .success-icon {
+      width: 66px;
+      height: 66px;
+      background: #4fa39a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+    }
+    .success-sub { color: #888; font-size: 15px; margin-bottom: 28px; line-height: 1.6; }
+    .success-email { color: #4fa39a; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<header class="header">
+  <div class="logo-lockup">
+    <div class="logo-icon">
+      <!-- Foundry Clinic zigzag mark -->
+      <svg width="36" height="42" viewBox="0 0 36 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="28,2 10,18 22,18 8,40" stroke="#4fa39a" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">The Foundry Clinic</div>
+      <div class="logo-tagline">Move well. Feel well. &nbsp;&bull;&nbsp; Sandwich, Kent</div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════ STEP PROGRESS ═══════════════════════════ -->
+<div class="progress-wrap">
+  <div class="progress-card">
+    <div class="steps" id="stepsEl"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+<main class="main">
+
+  <!-- ── Page: Welcome ── -->
+  <div class="page active" id="page-welcome">
+    <h1 class="page-title">Welcome</h1>
+    <p class="page-sub">Login or create an account to book your appointment.</p>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="emailInput" placeholder="Enter your email address"
+               onkeydown="if(event.key==='Enter') handleEmail()">
+      </div>
+      <button class="btn btn-primary" onclick="handleEmail()">Continue</button>
+      <p class="caption">We'll send you a secure code — no password needed.</p>
+    </div>
+  </div>
+
+  <!-- ── Page: Create Account ── -->
+  <div class="page" id="page-create">
+    <div class="section-tag">Appointment Booking</div>
+    <h1 class="page-title">Create account</h1>
+    <p class="page-sub">Tell us a little about yourself</p>
+    <div class="card">
+      <div class="notice" id="createNotice"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-input" type="text" id="firstNameInput">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" type="text" id="lastNameInput">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth</label>
+        <input class="form-input" type="text" id="dobInput" placeholder="DD / MM / YYYY" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" type="tel" id="phoneInput" placeholder="07700 000000">
+      </div>
+      <button class="btn btn-primary" onclick="createAccount()">Create account</button>
+      <p class="caption">We'll send you a 6-digit code to verify your email.</p>
+    </div>
+  </div>
+
+  <!-- ── Page: Select Service ── -->
+  <div class="page" id="page-service">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 2 of 8</div>
+    <h1 class="page-title">Select Service</h1>
+    <p class="page-sub">What type of treatment are you looking for?</p>
+    <div class="option-grid" id="serviceGrid"></div>
+    <button class="btn btn-primary" id="serviceBtn" onclick="nav(3)" disabled>Continue</button>
+  </div>
+
+  <!-- ── Page: Select Treatment ── -->
+  <div class="page" id="page-treatment">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 3 of 8</div>
+    <h1 class="page-title">Select Treatment</h1>
+    <p class="page-sub">Choose the treatment that best suits your needs.</p>
+    <div class="treatment-list" id="treatmentList"></div>
+    <button class="btn btn-primary" id="treatmentBtn" onclick="nav(4)" disabled>Continue</button>
+  </div>
+
+  <!-- ── Page: Select Specialist ── -->
+  <div class="page" id="page-specialist">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 4 of 8</div>
+    <h1 class="page-title">Select Specialist</h1>
+    <p class="page-sub">Choose a practitioner for your appointment.</p>
+    <div class="specialist-grid" id="specialistGrid"></div>
+    <button class="btn btn-primary" id="specialistBtn" onclick="nav(5)" disabled>Continue</button>
+  </div>
+
+  <!-- ── Page: Date & Time ── -->
+  <div class="page" id="page-datetime">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 5 of 8</div>
+    <h1 class="page-title">Select Date &amp; Time</h1>
+    <p class="page-sub">Pick a date and time that works for you.</p>
+    <div class="calendar" id="calWrap"></div>
+    <div id="slotsSection" style="display:none">
+      <div class="slots-label">Available times</div>
+      <div class="time-slots" id="slotsWrap"></div>
+    </div>
+    <button class="btn btn-primary" id="datetimeBtn" onclick="nav(6)" disabled>Continue</button>
+  </div>
+
+  <!-- ── Page: Payment Type ── -->
+  <div class="page" id="page-paytype">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 6 of 8</div>
+    <h1 class="page-title">Payment Type</h1>
+    <p class="page-sub">How would you like to pay for your appointment?</p>
+    <div class="option-grid" id="payTypeGrid"></div>
+    <button class="btn btn-primary" id="paytypeBtn" onclick="nav(7)" disabled>Continue</button>
+  </div>
+
+  <!-- ── Page: Booking Summary ── -->
+  <div class="page" id="page-summary">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 7 of 8</div>
+    <h1 class="page-title">Booking Summary</h1>
+    <p class="page-sub">Please review your appointment details before confirming.</p>
+    <div class="card" id="summaryCard"></div>
+    <button class="btn btn-primary" style="margin-top:4px;" onclick="nav(8)">Confirm &amp; Pay</button>
+  </div>
+
+  <!-- ── Page: Payment ── -->
+  <div class="page" id="page-payment">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="section-tag">Step 8 of 8</div>
+    <h1 class="page-title">Payment</h1>
+    <p class="page-sub">Enter your payment details to complete your booking.</p>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Cardholder Name</label>
+        <input class="form-input" type="text" placeholder="Name on card">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Card Number</label>
+        <input class="form-input" type="text" id="cardNumInput" placeholder="1234 5678 9012 3456" maxlength="19">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Expiry Date</label>
+          <input class="form-input" type="text" placeholder="MM / YY" maxlength="7">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CVV</label>
+          <input class="form-input" type="text" placeholder="123" maxlength="3">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="completeBooking()">Pay <span id="payAmtEl"></span></button>
+    </div>
+  </div>
+
+  <!-- ── Page: Success ── -->
+  <div class="page" id="page-success">
+    <div class="card success-wrap">
+      <div class="success-icon">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <path d="M5 15L12 22L25 9" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="page-title" style="text-align:center;margin-bottom:14px;">Booking Confirmed!</h1>
+      <p class="success-sub" id="successBody"></p>
+      <p style="font-size:13px;color:#aaa;">A confirmation has been sent to <span class="success-email" id="successEmailEl"></span></p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════ */
+const SERVICES = [
+  { id:'physio',     label:'Physiotherapy',          desc:'Assessment & rehabilitation' },
+  { id:'acupuncture',label:'Acupuncture',             desc:'Traditional & dry needling' },
+  { id:'massage',    label:'Massage Therapy',         desc:'Sports, remedial & full body' },
+  { id:'podiatry',   label:'Podiatry & Chiropody',    desc:'Foot care & minor surgery' },
+  { id:'pilates',    label:'Pilates & Yoga',           desc:'Group classes & packages' },
+  { id:'ultrasound', label:'Ultrasound & Injections', desc:'Diagnostic scans & guided injections' },
+];
+
+const TREATMENTS = {
+  physio: [
+    { name:'Initial Consultation',  duration:'45 min', price:59 },
+    { name:'Follow-up Consultation',duration:'30 min', price:48 },
+  ],
+  acupuncture: [
+    { name:'Initial Consultation',  duration:'60 min', price:70 },
+    { name:'Follow-up Consultation',duration:'30 min', price:55 },
+  ],
+  massage: [
+    { name:'Deep Tissue / Remedial (30 min)', duration:'30 min', price:42 },
+    { name:'Deep Tissue / Remedial (60 min)', duration:'60 min', price:62 },
+    { name:'Full Body Massage',               duration:'60 min', price:62 },
+    { name:'Back, Neck & Shoulder',           duration:'30 min', price:42 },
+  ],
+  podiatry: [
+    { name:'Routine Appointment',  duration:'30 min', price:47 },
+    { name:'Long Session',         duration:'60 min', price:77 },
+    { name:'Verruca Needling',     duration:'60 min', price:125 },
+    { name:'Nail Surgery',         duration:'60 min', price:300 },
+  ],
+  pilates: [
+    { name:'Group Class (single)',   duration:'60 min', price:10 },
+    { name:'6-Class Package',        duration:'6 × 60 min', price:50 },
+  ],
+  ultrasound: [
+    { name:'Scan with Report',                   duration:'45 min', price:90 },
+    { name:'Ultrasound at Initial Assessment',   duration:'45 min', price:30 },
+    { name:'Steroid Injection',                  duration:'45 min', price:160 },
+    { name:'Ultrasound Guided Steroid Injection',duration:'45 min', price:210 },
+    { name:'Ostenil Injection',                  duration:'45 min', price:210 },
+    { name:'Durolane Injection',                 duration:'45 min', price:260 },
+  ],
+};
+
+const SPECIALISTS = [
+  { id:'s1', name:'Llewellyn Boucher', role:'Founder & Clinical Lead, Advanced Physiotherapy Practitioner', init:'LB', svc:['physio','acupuncture','ultrasound'] },
+  { id:'s2', name:'Niel van Sittert',  role:'Physiotherapist',   init:'NV', svc:['physio','acupuncture','ultrasound'] },
+  { id:'s3', name:'Wian Opperman',     role:'Physiotherapist',   init:'WO', svc:['physio','massage'] },
+  { id:'s4', name:'Caroline du Toit',  role:'Podiatrist',        init:'CD', svc:['podiatry'] },
+  { id:'s5', name:'Lisa Baker',        role:'Massage Therapist', init:'LB', svc:['massage'] },
+  { id:'s6', name:'Julie LaBerge',     role:'Acupuncturist',     init:'JL', svc:['acupuncture'] },
+  { id:'s7', name:'Keke (Pei Liao)',   role:'Pilates Instructor',init:'KL', svc:['pilates'] },
+  { id:'s8', name:'Emily Gill',        role:'Pilates Teacher',   init:'EG', svc:['pilates'] },
+  { id:'s9', name:'Any Available',     role:'First available slot', init:'✓', svc:['physio','acupuncture','massage','podiatry','pilates','ultrasound'], teal:true },
+];
+
+const PAY_TYPES = [
+  { id:'self',        label:'Self Pay',    desc:'Pay directly by card' },
+  { id:'wpa',         label:'WPA',         desc:'WPA health insurance' },
+  { id:'simplyhealth',label:'SimplyHealth',desc:'SimplyHealth cover' },
+  { id:'vitality',    label:'Vitality',    desc:'Vitality health plan' },
+  { id:'aviva',       label:'Aviva',       desc:'Aviva health insurance' },
+  { id:'axa',         label:'AXA',         desc:'AXA health insurance' },
+];
+
+const STEP_LABELS = ['Welcome','Select\nService','Select\nTreatment','Select\nSpecialist','Select Date\n& Time','Payment\nType','Booking\nSummary','Payment'];
+const PAGE_IDS    = ['welcome','service','treatment','specialist','datetime','paytype','summary','payment'];
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+const S = {
+  stepNum: 1,
+  email: '',
+  service: null,
+  treatmentIdx: null,
+  specialist: null,
+  date: null,
+  time: null,
+  payType: null,
+};
+const history = [];
+
+/* ══════════════════════════════════════════════════
+   STEPS INDICATOR
+══════════════════════════════════════════════════ */
+function renderSteps(forceAll) {
+  const el = document.getElementById('stepsEl');
+  el.innerHTML = '';
+  for (let i = 0; i < 8; i++) {
+    const n = i + 1;
+    const active = n === S.stepNum;
+    const done   = n < S.stepNum || forceAll;
+    const labels = STEP_LABELS[i].split('\n');
+    el.innerHTML += `
+      <div class="step ${active?'active':''} ${done?'done':''}">
+        <div class="step-circle">${done ? '✓' : n}</div>
+        <div class="step-label">${labels.join('<br>')}</div>
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function nav(stepNum) {
+  history.push({ stepNum: S.stepNum, pageId: PAGE_IDS[S.stepNum - 1] });
+  S.stepNum = stepNum;
+  const pageId = PAGE_IDS[stepNum - 1];
+  showPage(pageId);
+  renderSteps();
+  if (pageId === 'treatment')   renderTreatments();
+  if (pageId === 'specialist')  renderSpecialists();
+  if (pageId === 'datetime')    { calMonth = new Date(2026,4,1); renderCalendar(); }
+  if (pageId === 'summary')     renderSummary();
+  if (pageId === 'payment')     renderPayment();
+}
+
+function goBack() {
+  if (!history.length) return;
+  const prev = history.pop();
+  S.stepNum = prev.stepNum;
+  showPage(prev.pageId);
+  renderSteps();
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 1 — WELCOME
+══════════════════════════════════════════════════ */
+function handleEmail() {
+  const v = document.getElementById('emailInput').value.trim();
+  if (!v || !v.includes('@')) { alert('Please enter a valid email address.'); return; }
+  S.email = v;
+  document.getElementById('createNotice').innerHTML =
+    `We don't recognise <strong>${v}</strong>. <a onclick="history.push({stepNum:S.stepNum,pageId:'create'});showPage('welcome')">Use a different email</a>`;
+  history.push({ stepNum: 1, pageId: 'welcome' });
+  showPage('create');
+}
+
+function createAccount() {
+  const fn = document.getElementById('firstNameInput').value.trim();
+  const ln = document.getElementById('lastNameInput').value.trim();
+  if (!fn || !ln) { alert('Please enter your first and last name.'); return; }
+  nav(2);
+}
+
+/* ── DOB auto-format ── */
+document.getElementById('dobInput').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'');
+  if (v.length > 2) v = v.slice(0,2) + ' / ' + v.slice(2);
+  if (v.length > 9) v = v.slice(0,9) + ' / ' + v.slice(9);
+  this.value = v.slice(0,14);
+});
+
+/* ══════════════════════════════════════════════════
+   STEP 2 — SERVICE
+══════════════════════════════════════════════════ */
+function renderServices() {
+  const g = document.getElementById('serviceGrid');
+  g.innerHTML = '';
+  SERVICES.forEach(sv => {
+    const d = document.createElement('div');
+    d.className = 'option-card' + (S.service === sv.id ? ' selected' : '');
+    d.innerHTML = `<div class="option-card-title">${sv.label}</div>
+      <div class="option-card-meta">${sv.desc}</div>`;
+    d.onclick = () => {
+      S.service = sv.id; S.treatmentIdx = null; S.specialist = null;
+      renderServices();
+      document.getElementById('serviceBtn').disabled = false;
+    };
+    g.appendChild(d);
+  });
+}
+renderServices();
+
+/* ══════════════════════════════════════════════════
+   STEP 3 — TREATMENT
+══════════════════════════════════════════════════ */
+function renderTreatments() {
+  const list = document.getElementById('treatmentList');
+  list.innerHTML = '';
+  (TREATMENTS[S.service] || []).forEach((t, i) => {
+    const d = document.createElement('div');
+    d.className = 'treatment-item' + (S.treatmentIdx === i ? ' selected' : '');
+    d.innerHTML = `<div>
+        <div class="treatment-name">${t.name}</div>
+        <div class="treatment-meta">${t.duration}</div>
+      </div>
+      <div class="treatment-price">£${t.price}</div>`;
+    d.onclick = () => {
+      S.treatmentIdx = i;
+      renderTreatments();
+      document.getElementById('treatmentBtn').disabled = false;
+    };
+    list.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 4 — SPECIALIST
+══════════════════════════════════════════════════ */
+function renderSpecialists() {
+  const g = document.getElementById('specialistGrid');
+  g.innerHTML = '';
+  SPECIALISTS.filter(sp => sp.svc.includes(S.service)).forEach(sp => {
+    const d = document.createElement('div');
+    d.className = 'specialist-card' + (S.specialist === sp.id ? ' selected' : '');
+    d.innerHTML = `<div class="specialist-avatar${sp.teal?' teal':''}">${sp.init}</div>
+      <div class="specialist-name">${sp.name}</div>
+      <div class="specialist-role">${sp.role}</div>`;
+    d.onclick = () => {
+      S.specialist = sp.id;
+      renderSpecialists();
+      document.getElementById('specialistBtn').disabled = false;
+    };
+    g.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 5 — DATE & TIME
+══════════════════════════════════════════════════ */
+let calMonth = new Date(2026, 4, 1);
+const UNAVAIL = ['10:00','11:30','14:00','16:00'];
+const ALL_SLOTS = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00',
+                   '13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'];
+
+function renderCalendar() {
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const monthStr = calMonth.toLocaleString('default',{month:'long'}) + ' ' + y;
+
+  let html = `<div class="cal-header">
+    <button class="cal-nav" onclick="changeMonth(-1)">&#8249;</button>
+    <div class="cal-month">${monthStr}</div>
+    <button class="cal-nav" onclick="changeMonth(1)">&#8250;</button>
+  </div>
+  <div class="cal-grid">
+    ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-day-label">${d}</div>`).join('')}`;
+
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day emp"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(y, m, d);
+    const isPast    = dt < today;
+    const isWeekend = dt.getDay() === 0 || dt.getDay() === 6;
+    const dis = isPast || isWeekend;
+    const isSel  = S.date && S.date.toDateString() === dt.toDateString();
+    const isToday = dt.toDateString() === today.toDateString();
+    html += `<div class="cal-day ${dis?'dis':''} ${isSel?'sel':''} ${isToday&&!isSel?'tod':''}"
+      ${!dis ? `onclick="selectDate(${y},${m},${d})"` : ''}>${d}</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('calWrap').innerHTML = html;
+}
+
+function changeMonth(dir) {
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + dir, 1);
+  renderCalendar();
+}
+
+function selectDate(y, m, d) {
+  S.date = new Date(y, m, d);
+  S.time = null;
+  renderCalendar();
+  document.getElementById('slotsSection').style.display = 'block';
+  renderSlots();
+  document.getElementById('datetimeBtn').disabled = true;
+}
+
+function renderSlots() {
+  const w = document.getElementById('slotsWrap');
+  w.innerHTML = '';
+  ALL_SLOTS.forEach(t => {
+    const unavail = UNAVAIL.includes(t);
+    const sel     = S.time === t;
+    const d = document.createElement('div');
+    d.className = `slot ${unavail?'unavail':''} ${sel?'sel':''}`;
+    d.textContent = t;
+    if (!unavail) d.onclick = () => {
+      S.time = t; renderSlots();
+      document.getElementById('datetimeBtn').disabled = false;
+    };
+    w.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 6 — PAYMENT TYPE
+══════════════════════════════════════════════════ */
+function renderPayTypes() {
+  const g = document.getElementById('payTypeGrid');
+  g.innerHTML = '';
+  PAY_TYPES.forEach(pt => {
+    const d = document.createElement('div');
+    d.className = 'option-card' + (S.payType === pt.id ? ' selected' : '');
+    d.innerHTML = `<div class="option-card-title">${pt.label}</div>
+      <div class="option-card-meta">${pt.desc}</div>`;
+    d.onclick = () => {
+      S.payType = pt.id; renderPayTypes();
+      document.getElementById('paytypeBtn').disabled = false;
+    };
+    g.appendChild(d);
+  });
+}
+renderPayTypes();
+
+/* ══════════════════════════════════════════════════
+   STEP 7 — SUMMARY
+══════════════════════════════════════════════════ */
+function renderSummary() {
+  const svc  = SERVICES.find(s => s.id === S.service);
+  const trt  = S.treatmentIdx !== null ? TREATMENTS[S.service][S.treatmentIdx] : null;
+  const sp   = SPECIALISTS.find(s => s.id === S.specialist);
+  const pt   = PAY_TYPES.find(p => p.id === S.payType);
+  const dateStr = S.date ? S.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
+
+  document.getElementById('summaryCard').innerHTML = `
+    <div class="summary-row"><span class="sum-label">Service</span><span class="sum-val">${svc?.label||'—'}</span></div>
+    <div class="summary-row"><span class="sum-label">Treatment</span><span class="sum-val">${trt ? trt.name + ' ('+trt.duration+')' : '—'}</span></div>
+    <div class="summary-row"><span class="sum-label">Practitioner</span><span class="sum-val">${sp?.name||'—'}</span></div>
+    <div class="summary-row"><span class="sum-label">Date</span><span class="sum-val">${dateStr}</span></div>
+    <div class="summary-row"><span class="sum-label">Time</span><span class="sum-val">${S.time||'—'}</span></div>
+    <div class="summary-row"><span class="sum-label">Payment Type</span><span class="sum-val">${pt?.label||'—'}</span></div>
+    <div class="summary-row" style="margin-top:6px;padding-top:16px;border-top:2px solid #e8e5e0;border-bottom:none;">
+      <span class="sum-label" style="font-weight:700;font-size:14px;color:#1e1e1e;">Total</span>
+      <span class="sum-val sum-total">£${trt?.price||0}</span>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   STEP 8 — PAYMENT
+══════════════════════════════════════════════════ */
+function renderPayment() {
+  const trt = S.treatmentIdx !== null ? TREATMENTS[S.service][S.treatmentIdx] : null;
+  document.getElementById('payAmtEl').textContent = trt ? `£${trt.price}` : '';
+}
+
+document.getElementById('cardNumInput').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'').slice(0,16);
+  this.value = v.replace(/(.{4})/g,'$1 ').trim();
+});
+
+/* ══════════════════════════════════════════════════
+   COMPLETE
+══════════════════════════════════════════════════ */
+function completeBooking() {
+  const trt  = S.treatmentIdx !== null ? TREATMENTS[S.service][S.treatmentIdx] : null;
+  const dateStr = S.date ? S.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'}) : '';
+  document.getElementById('successBody').textContent =
+    `Your ${trt?.name||'appointment'} has been booked for ${dateStr} at ${S.time}.`;
+  document.getElementById('successEmailEl').textContent = S.email;
+  history.push({ stepNum: 8, pageId: 'payment' });
+  showPage('success');
+  renderSteps(true);
+}
+
+/* ── Init ── */
+renderSteps();
+</script>
+</body>
+</html>
