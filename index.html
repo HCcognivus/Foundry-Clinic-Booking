@@ -238,7 +238,7 @@
     }
     .back-btn:hover { color: #4fa39a; }
 
-    /* ── Option grid (services / payment type) ── */
+    /* ── Option grid (services) ── */
     .option-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -246,19 +246,46 @@
       margin-bottom: 22px;
     }
     .option-card {
+      border: 2.5px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      background: #fff;
+      user-select: none;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .option-card:hover { border-color: #4fa39a; box-shadow: 0 4px 14px rgba(79,163,154,0.18); }
+    .option-card.selected { border-color: #4fa39a; box-shadow: 0 4px 14px rgba(79,163,154,0.25); }
+    .option-card-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+    .option-card-body { padding: 12px 14px 14px; }
+    .option-card-title { font-weight: 600; font-size: 13.5px; color: #1e1e1e; margin-bottom: 2px; }
+    .option-card-meta { font-size: 11.5px; color: #999; }
+    /* ── Plain option grid (payment type — no images) ── */
+    .plain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 11px;
+      margin-bottom: 22px;
+    }
+    .plain-card {
       border: 1.5px solid #e0ddd8;
       border-radius: 10px;
-      padding: 20px 18px;
+      padding: 18px 16px;
       cursor: pointer;
       transition: border-color 0.18s, background 0.18s;
       background: #fff;
       user-select: none;
     }
-    .option-card:hover { border-color: #4fa39a; }
-    .option-card.selected { border-color: #4fa39a; background: #f0f4f7; }
-    .option-card-icon { font-size: 26px; margin-bottom: 8px; }
-    .option-card-title { font-weight: 600; font-size: 14.5px; color: #1e1e1e; margin-bottom: 3px; }
-    .option-card-meta { font-size: 12.5px; color: #999; }
+    .plain-card:hover { border-color: #4fa39a; }
+    .plain-card.selected { border-color: #4fa39a; background: #f0f7f6; }
+    .plain-card-title { font-weight: 600; font-size: 14px; color: #1e1e1e; margin-bottom: 3px; }
+    .plain-card-meta { font-size: 12px; color: #999; }
 
     /* ── Treatment list ── */
     .treatment-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 22px; }
@@ -549,7 +576,7 @@
     <div class="section-tag">Step 6 of 8</div>
     <h1 class="page-title">Payment Type</h1>
     <p class="page-sub">How would you like to pay for your appointment?</p>
-    <div class="option-grid" id="payTypeGrid"></div>
+    <div class="plain-grid" id="payTypeGrid"></div>
     <button class="btn btn-primary" id="paytypeBtn" onclick="nav(7)" disabled>Continue</button>
   </div>
 
@@ -613,12 +640,12 @@
    DATA
 ══════════════════════════════════════════════════ */
 const SERVICES = [
-  { id:'physio',     label:'Physiotherapy',          desc:'Assessment & rehabilitation' },
-  { id:'acupuncture',label:'Acupuncture',             desc:'Traditional & dry needling' },
-  { id:'massage',    label:'Massage Therapy',         desc:'Sports, remedial & full body' },
-  { id:'podiatry',   label:'Podiatry & Chiropody',    desc:'Foot care & minor surgery' },
-  { id:'pilates',    label:'Pilates & Yoga',           desc:'Group classes & packages' },
-  { id:'ultrasound', label:'Ultrasound & Injections', desc:'Diagnostic scans & guided injections' },
+  { id:'physio',     label:'Physiotherapy',          desc:'Assessment & rehabilitation',        img:'https://thefoundryclinic.co.uk/wp-content/uploads/2022/07/man-getting-physio-therapy-at-the-foundry-clinic-kent.png' },
+  { id:'acupuncture',label:'Acupuncture',             desc:'Traditional & dry needling',         img:'https://thefoundryclinic.co.uk/wp-content/uploads/2025/08/acupuncturist-performing-back-acupuncture-for-pain-relief.webp' },
+  { id:'massage',    label:'Massage Therapy',         desc:'Sports, remedial & full body',       img:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/remedial-massage-therapy-in-thanet-kent.jpg' },
+  { id:'podiatry',   label:'Podiatry & Chiropody',    desc:'Foot care & minor surgery',          img:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/podiatry-treatments-in-thanet-1.jpg' },
+  { id:'pilates',    label:'Pilates & Yoga',           desc:'Group classes & packages',           img:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/11/pilates-at-the-foundry-clinic-kent-sandwich.jpg' },
+  { id:'ultrasound', label:'Ultrasound & Injections', desc:'Diagnostic scans & guided injections',img:'https://thefoundryclinic.co.uk/wp-content/uploads/2022/07/Diagnostic-musculoskeletal-ultrasound-clinic-in-kent.jpg' },
 ];
 
 const TREATMENTS = {
@@ -781,8 +808,11 @@ function renderServices() {
   SERVICES.forEach(sv => {
     const d = document.createElement('div');
     d.className = 'option-card' + (S.service === sv.id ? ' selected' : '');
-    d.innerHTML = `<div class="option-card-title">${sv.label}</div>
-      <div class="option-card-meta">${sv.desc}</div>`;
+    d.innerHTML = `<img class="option-card-img" src="${sv.img}" alt="${sv.label}">
+      <div class="option-card-body">
+        <div class="option-card-title">${sv.label}</div>
+        <div class="option-card-meta">${sv.desc}</div>
+      </div>`;
     d.onclick = () => {
       S.service = sv.id; S.treatmentIdx = null; S.specialist = null;
       renderServices();
@@ -915,9 +945,9 @@ function renderPayTypes() {
   g.innerHTML = '';
   PAY_TYPES.forEach(pt => {
     const d = document.createElement('div');
-    d.className = 'option-card' + (S.payType === pt.id ? ' selected' : '');
-    d.innerHTML = `<div class="option-card-title">${pt.label}</div>
-      <div class="option-card-meta">${pt.desc}</div>`;
+    d.className = 'plain-card' + (S.payType === pt.id ? ' selected' : '');
+    d.innerHTML = `<div class="plain-card-title">${pt.label}</div>
+      <div class="plain-card-meta">${pt.desc}</div>`;
     d.onclick = () => {
       S.payType = pt.id; renderPayTypes();
       document.getElementById('paytypeBtn').disabled = false;
