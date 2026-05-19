@@ -284,6 +284,12 @@
     }
     .plain-card:hover { border-color: #4fa39a; }
     .plain-card.selected { border-color: #4fa39a; background: #f0f7f6; }
+    .plain-card-logo {
+      height: 48px;
+      object-fit: contain;
+      display: block;
+      margin-bottom: 10px;
+    }
     .plain-card-title { font-weight: 600; font-size: 14px; color: #1e1e1e; margin-bottom: 3px; }
     .plain-card-meta { font-size: 12px; color: #999; }
 
@@ -696,12 +702,12 @@ const SPECIALISTS = [
 ];
 
 const PAY_TYPES = [
-  { id:'self',        label:'Self Pay',    desc:'Pay directly by card' },
-  { id:'wpa',         label:'WPA',         desc:'WPA health insurance' },
-  { id:'simplyhealth',label:'SimplyHealth',desc:'SimplyHealth cover' },
-  { id:'vitality',    label:'Vitality',    desc:'Vitality health plan' },
-  { id:'aviva',       label:'Aviva',       desc:'Aviva health insurance' },
-  { id:'axa',         label:'AXA',         desc:'AXA health insurance' },
+  { id:'self',        label:'Self Pay',    desc:'Pay directly by card', logo:null },
+  { id:'wpa',         label:'WPA',         desc:'WPA health insurance',  logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/WPA-270x202-1.png' },
+  { id:'simplyhealth',label:'SimplyHealth',desc:'SimplyHealth cover',    logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/SimplyHealth-270x202-1.png' },
+  { id:'vitality',    label:'Vitality',    desc:'Vitality health plan',  logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/Vitality-270x202-1.png' },
+  { id:'aviva',       label:'Aviva',       desc:'Aviva health insurance',logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/Aviva-270x202-1.png' },
+  { id:'axa',         label:'AXA',         desc:'AXA health insurance',  logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/AXA-270x202-1.png' },
 ];
 
 const STEP_LABELS = ['Welcome','Select\nService','Select\nTreatment','Select\nSpecialist','Select Date\n& Time','Payment\nType','Booking\nSummary','Payment'];
@@ -946,8 +952,9 @@ function renderPayTypes() {
   PAY_TYPES.forEach(pt => {
     const d = document.createElement('div');
     d.className = 'plain-card' + (S.payType === pt.id ? ' selected' : '');
-    d.innerHTML = `<div class="plain-card-title">${pt.label}</div>
-      <div class="plain-card-meta">${pt.desc}</div>`;
+    d.innerHTML = pt.logo
+      ? `<img class="plain-card-logo" src="${pt.logo}" alt="${pt.label}"><div class="plain-card-meta">${pt.desc}</div>`
+      : `<div class="plain-card-title">${pt.label}</div><div class="plain-card-meta">${pt.desc}</div>`;
     d.onclick = () => {
       S.payType = pt.id; renderPayTypes();
       document.getElementById('paytypeBtn').disabled = false;
