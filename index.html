@@ -532,40 +532,35 @@
     </div>
   </div>
 
-  <!-- ── Page: Select Service ── -->
+  <!-- ── Page: Select Service & Treatment ── -->
   <div class="page" id="page-service">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 2 of 8</div>
+    <div class="section-tag">Step 2 of 7</div>
     <h1 class="page-title">Select Service</h1>
     <p class="page-sub">What type of treatment are you looking for?</p>
     <div class="option-grid" id="serviceGrid"></div>
+    <div id="treatmentSection" style="display:none;">
+      <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:400;color:#1e1e1e;margin-bottom:6px;">Select Treatment</h2>
+      <p class="page-sub">Choose the treatment that best suits your needs.</p>
+      <div class="treatment-list" id="treatmentList"></div>
+    </div>
     <button class="btn btn-primary" id="serviceBtn" onclick="nav(3)" disabled>Continue</button>
-  </div>
-
-  <!-- ── Page: Select Treatment ── -->
-  <div class="page" id="page-treatment">
-    <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 3 of 8</div>
-    <h1 class="page-title">Select Treatment</h1>
-    <p class="page-sub">Choose the treatment that best suits your needs.</p>
-    <div class="treatment-list" id="treatmentList"></div>
-    <button class="btn btn-primary" id="treatmentBtn" onclick="nav(4)" disabled>Continue</button>
   </div>
 
   <!-- ── Page: Select Specialist ── -->
   <div class="page" id="page-specialist">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 4 of 8</div>
+    <div class="section-tag">Step 3 of 7</div>
     <h1 class="page-title">Select Specialist</h1>
     <p class="page-sub">Choose a practitioner for your appointment.</p>
     <div class="specialist-grid" id="specialistGrid"></div>
-    <button class="btn btn-primary" id="specialistBtn" onclick="nav(5)" disabled>Continue</button>
+    <button class="btn btn-primary" id="specialistBtn" onclick="nav(4)" disabled>Continue</button>
   </div>
 
   <!-- ── Page: Date & Time ── -->
   <div class="page" id="page-datetime">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 5 of 8</div>
+    <div class="section-tag">Step 4 of 7</div>
     <h1 class="page-title">Select Date &amp; Time</h1>
     <p class="page-sub">Pick a date and time that works for you.</p>
     <div class="calendar" id="calWrap"></div>
@@ -573,13 +568,13 @@
       <div class="slots-label">Available times</div>
       <div class="time-slots" id="slotsWrap"></div>
     </div>
-    <button class="btn btn-primary" id="datetimeBtn" onclick="nav(6)" disabled>Continue</button>
+    <button class="btn btn-primary" id="datetimeBtn" onclick="nav(5)" disabled>Continue</button>
   </div>
 
   <!-- ── Page: Payment Type ── -->
   <div class="page" id="page-paytype">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 6 of 8</div>
+    <div class="section-tag">Step 5 of 7</div>
     <h1 class="page-title">Payment Type</h1>
     <p class="page-sub">How would you like to pay for your appointment?</p>
     <div class="plain-grid" id="payTypeGrid"></div>
@@ -589,17 +584,17 @@
   <!-- ── Page: Booking Summary ── -->
   <div class="page" id="page-summary">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 7 of 8</div>
+    <div class="section-tag">Step 6 of 7</div>
     <h1 class="page-title">Booking Summary</h1>
     <p class="page-sub">Please review your appointment details before confirming.</p>
     <div class="card" id="summaryCard"></div>
-    <button class="btn btn-primary" style="margin-top:4px;" onclick="nav(8)">Confirm &amp; Pay</button>
+    <button class="btn btn-primary" style="margin-top:4px;" onclick="nav(7)">Confirm &amp; Pay</button>
   </div>
 
   <!-- ── Page: Payment ── -->
   <div class="page" id="page-payment">
     <button class="back-btn" onclick="goBack()">← Back</button>
-    <div class="section-tag">Step 8 of 8</div>
+    <div class="section-tag">Step 7 of 7</div>
     <h1 class="page-title">Payment</h1>
     <p class="page-sub">Enter your payment details to complete your booking.</p>
     <div class="card">
@@ -710,8 +705,8 @@ const PAY_TYPES = [
   { id:'axa',         label:'AXA',         desc:'AXA health insurance',  logo:'https://thefoundryclinic.co.uk/wp-content/uploads/2023/02/AXA-270x202-1.png' },
 ];
 
-const STEP_LABELS = ['Welcome','Select\nService','Select\nTreatment','Select\nSpecialist','Select Date\n& Time','Payment\nType','Booking\nSummary','Payment'];
-const PAGE_IDS    = ['welcome','service','treatment','specialist','datetime','paytype','summary','payment'];
+const STEP_LABELS = ['Welcome','Select\nService','Select\nSpecialist','Select Date\n& Time','Payment\nType','Booking\nSummary','Payment'];
+const PAGE_IDS    = ['welcome','service','specialist','datetime','paytype','summary','payment'];
 
 /* ══════════════════════════════════════════════════
    STATE
@@ -762,7 +757,6 @@ function nav(stepNum) {
   const pageId = PAGE_IDS[stepNum - 1];
   showPage(pageId);
   renderSteps();
-  if (pageId === 'treatment')   renderTreatments();
   if (pageId === 'specialist')  renderSpecialists();
   if (pageId === 'datetime')    { calMonth = new Date(2026,4,1); renderCalendar(); }
   if (pageId === 'summary')     renderSummary();
@@ -822,7 +816,10 @@ function renderServices() {
     d.onclick = () => {
       S.service = sv.id; S.treatmentIdx = null; S.specialist = null;
       renderServices();
-      document.getElementById('serviceBtn').disabled = false;
+      document.getElementById('serviceBtn').disabled = true;
+      document.getElementById('treatmentSection').style.display = 'block';
+      renderTreatments();
+      document.getElementById('treatmentSection').scrollIntoView({ behavior:'smooth', block:'start' });
     };
     g.appendChild(d);
   });
@@ -846,7 +843,7 @@ function renderTreatments() {
     d.onclick = () => {
       S.treatmentIdx = i;
       renderTreatments();
-      document.getElementById('treatmentBtn').disabled = false;
+      document.getElementById('serviceBtn').disabled = false;
     };
     list.appendChild(d);
   });
