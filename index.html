@@ -578,7 +578,7 @@
     <h1 class="page-title">Payment Type</h1>
     <p class="page-sub">How would you like to pay for your appointment?</p>
     <div class="plain-grid" id="payTypeGrid"></div>
-    <button class="btn btn-primary" id="paytypeBtn" onclick="nav(7)" disabled>Continue</button>
+    <button class="btn btn-primary" id="paytypeBtn" onclick="nav(6)" disabled>Continue</button>
   </div>
 
   <!-- ── Page: Booking Summary ── -->
@@ -729,7 +729,7 @@ const history = [];
 function renderSteps(forceAll) {
   const el = document.getElementById('stepsEl');
   el.innerHTML = '';
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     const n = i + 1;
     const active = n === S.stepNum;
     const done   = n < S.stepNum || forceAll;
